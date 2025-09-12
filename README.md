@@ -55,3 +55,5 @@ An application to perform enhanced semantic searches on the PubMed database for 
 
 Once the backend is running, you can access the API documentation at:
 `http://localhost:8000/docs`
+
+Small change
