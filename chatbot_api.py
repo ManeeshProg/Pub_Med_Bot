@@ -11,10 +11,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from bson import ObjectId
 import jwt
 import os
+from dotenv import load_dotenv
 
 # -----------------------------
 # 1. Setup
 # -----------------------------
+load_dotenv()
 warnings.filterwarnings("ignore", message="You appear to be connected to a CosmosDB cluster")
 
 groq_api_key = os.getenv("GROQ_API")
