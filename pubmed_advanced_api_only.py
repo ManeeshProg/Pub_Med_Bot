@@ -3,9 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List, Tuple, Union
 from datetime import datetime, timezone
-import requests, re, hashlib, jwt
+import requests, re, hashlib, jwt, os
 from pymongo import MongoClient
 import xml.etree.ElementTree as ET
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # -----------------------------
 # FastAPI App
@@ -26,7 +29,7 @@ app.add_middleware(
 # -----------------------------
 # MongoDB Setup
 # -----------------------------
-connection_string = "mongodb+srv://praneeshroshan_db_user:0F6f0m54x4MJ9Qbz@cts.aevkhjk.mongodb.net/?retryWrites=true&w=majority&appName=CTS"
+connection_string = os.getenv("MONGO_URI")
 mongo_client = MongoClient(connection_string)
 db = mongo_client["pubmed_db"]
 advanced_collection = db["articles"]
@@ -35,14 +38,14 @@ history_collection = db["search_history"]
 # -----------------------------
 # JWT Secret (must match Express)
 # -----------------------------
-JWT_SECRET = "supersecretkey"  # ⚠️ must be the same as in server.js
+JWT_SECRET = os.getenv("JWT_SECRET", "supersecretkey")
 JWT_ALGORITHM = "HS256"
 
 
 # -----------------------------
 # NCBI API Key
 # -----------------------------
-API_KEY = "78bfef950a57420d97564f08d3f66794c308"
+API_KEY = os.getenv("NCBI_API_KEY")
 
 # -----------------------------
 # Request Schemas
