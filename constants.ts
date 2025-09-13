@@ -17,6 +17,6 @@ export const PUBLICATION_TYPES = [
   "Clinical Trial",
 ];
 
-export const ADVANCED_API_BASE = 'http://127.0.0.1:8000';
-export const CHATBOT_API_BASE = 'http://127.0.0.1:8002';
-export const GROQ_API_BASE = 'http://127.0.0.1:8001'; // update if groq runs on another port
+export const ADVANCED_API_BASE = 'https://advanced-api-app.wonderfulriver-100a8c4.eastasia.azurecontainerapps.io';
+export const CHATBOT_API_BASE = 'https://chatbot-api-app.wonderfulriver-100a8c4.eastasia.azurecontainerapps.io';
+export const GROQ_API_BASE = 'https://groq-api-app.wonderfulriver-100a8c4.eastasia.azurecontainerapps.io'; // update if groq runs on another port
