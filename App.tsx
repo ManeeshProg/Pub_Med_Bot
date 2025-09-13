@@ -9,7 +9,7 @@ import SearchPage from './components/SearchPage';
 import Profile from './components/Profile';
 import History from './components/History';
 import Header from './components/Header';
-import GroqSearchPage from './components/GroqSearchPage';
+import SemanticSearchPage from './components/SemanticSearchPage';
 import GroqHistory from './components/GroqHistory';
 import Dashboard from './components/Dashboard';
 import ChatbotPage from './components/ChatbotPage';
@@ -112,10 +112,10 @@ const App: React.FC = () => {
           }
         />
         <Route
-          path="/groq"
+          path="/semantic-search"
           element={
             <ProtectedLayout>
-              <GroqSearchPage />
+              <SemanticSearchPage />
             </ProtectedLayout>
           }
         />

@@ -1,11 +1,11 @@
 import React, { useState, useRef } from 'react';
-import { searchGroq, GroqResultItem } from '../services/groqService';
+import { semanticSearch, SemanticSearchResultItem } from '../services/semanticSearchService';
 
-const GroqSearchPage: React.FC = () => {
+const SemanticSearchPage: React.FC = () => {
   const [query, setQuery] = useState('');
   const [topK, setTopK] = useState<number>(10);
   const [threshold, setThreshold] = useState<number>(0.7);
-  const [results, setResults] = useState<GroqResultItem[]>([]);
+  const [results, setResults] = useState<SemanticSearchResultItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const abortRef = useRef<AbortController | null>(null);
@@ -25,7 +25,7 @@ const GroqSearchPage: React.FC = () => {
 
     setLoading(true);
     try {
-      const data = await searchGroq(query, topK, threshold, controller.signal);
+      const data = await semanticSearch(query, topK, threshold, controller.signal);
       setResults(data);
     } catch (e: any) {
       if (e?.name === 'CanceledError' || e?.code === 'ERR_CANCELED') {
@@ -33,7 +33,7 @@ const GroqSearchPage: React.FC = () => {
       } else if (e?.code === 'ECONNABORTED') {
         setError('Request timed out. Try lowering top_k.');
       } else {
-        setError(e?.message || 'Failed to run Groq search');
+        setError(e?.message || 'Failed to run semantic search');
       }
     } finally {
       setLoading(false);
@@ -42,7 +42,7 @@ const GroqSearchPage: React.FC = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-slate-800">Groq Semantic Search</h1>
+      <h1 className="text-2xl font-bold text-slate-800">Semantic Search</h1>
       <div className="mt-4 grid gap-3">
         <div className="flex gap-2">
           <input
@@ -108,4 +108,4 @@ const GroqSearchPage: React.FC = () => {
   );
 };
 
-export default GroqSearchPage;
+export default SemanticSearchPage;

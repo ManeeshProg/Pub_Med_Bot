@@ -18,5 +18,5 @@ export const PUBLICATION_TYPES = [
 ];
 
 export const ADVANCED_API_BASE = 'http://localhost:8000';
-export const CHATBOT_API_BASE = 'http://localhost:8001';
-export const GROQ_API_BASE = 'http://localhost:8002';
+export const CHATBOT_API_BASE = 'http://localhost:8002';
+export const SEMANTIC_SEARCH_API_BASE = 'http://localhost:8002';

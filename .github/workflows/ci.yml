@@ -14,7 +14,6 @@ jobs:
       contents: read
 
     env:
-      GROQ_API: ${{ secrets.GROQ_API }}
       MONGO_URI: ${{ secrets.MONGO_URI }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
@@ -75,11 +74,6 @@ jobs:
         run: |
           docker build -t ${{ env.ACR_NAME }}.azurecr.io/advanced-api:latest -f Dockerfile.advanced_api .
           docker push ${{ env.ACR_NAME }}.azurecr.io/advanced-api:latest
-
-      - name: Build and push Groq API image
-        run: |
-          docker build -t ${{ env.ACR_NAME }}.azurecr.io/groq-api:latest -f Dockerfile.groq .
-          docker push ${{ env.ACR_NAME }}.azurecr.io/groq-api:latest
 
       - name: Build and push Frontend image
         run: |
@@ -147,9 +141,9 @@ jobs:
           targetPort: 8002
           ingress: external
           environmentVariables: |
-            GROQ_API=${{ secrets.GROQ_API }}
             MONGO_URI=${{ secrets.MONGO_URI }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
+            GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
 
       - name: Deploy Advanced API
         uses: azure/container-apps-deploy-action@v1
@@ -167,23 +161,6 @@ jobs:
             MONGO_URI=${{ secrets.MONGO_URI }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             NCBI_API_KEY=${{ secrets.NCBI_API_KEY }}
-
-      - name: Deploy Groq API
-        uses: azure/container-apps-deploy-action@v1
-        with:
-          containerAppName: groq-api-app
-          resourceGroup: ${{ env.RESOURCE_GROUP }}
-          imageToDeploy: ${{ env.ACR_NAME }}.azurecr.io/groq-api:latest
-          containerAppEnvironment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
-          registryUrl: ${{ env.ACR_NAME }}.azurecr.io
-          registryUsername: ${{ env.ACR_NAME }}
-          registryPassword: ${{ secrets.ACR_PASSWORD }}
-          targetPort: 8001
-          ingress: external
-          environmentVariables: |
-            JWT_SECRET=${{ secrets.JWT_SECRET }}
-            GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
-            GROQ_API=${{ secrets.GROQ_API }}
 
       - name: Deploy Frontend
         uses: azure/container-apps-deploy-action@v1

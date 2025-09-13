@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { GROQ_API_BASE } from '../constants';
+import { SEMANTIC_SEARCH_API_BASE } from '../constants';
 import { makeAuthenticatedRequest } from '../utils/auth.js';
 
-export interface GroqResultItem {
+export interface SemanticSearchResultItem {
   article: {
     pmid?: string;
     title?: string;
@@ -14,8 +14,8 @@ export interface GroqResultItem {
   score: number;
 }
 
-export async function searchGroq(query: string, top_k: number = 10, threshold: number = 0.7, signal?: AbortSignal): Promise<GroqResultItem[]> {
-  const url = `${GROQ_API_BASE}/search/semantic`;
+export async function semanticSearch(query: string, top_k: number = 10, threshold: number = 0.7, signal?: AbortSignal): Promise<SemanticSearchResultItem[]> {
+  const url = `${SEMANTIC_SEARCH_API_BASE}/search/semantic`;
   const token = typeof window !== 'undefined' ? localStorage.getItem('jwt_token') : null;
 
   if (!token) {
@@ -35,7 +35,7 @@ export async function searchGroq(query: string, top_k: number = 10, threshold: n
     );
     const raw = res.data?.results ?? [];
 
-    const normalized: GroqResultItem[] = raw.map((item: any) => {
+    const normalized: SemanticSearchResultItem[] = raw.map((item: any) => {
       if (Array.isArray(item) && item.length >= 2) {
         return { article: item[0] || {}, score: Number(item[1]) || 0 };
       }
