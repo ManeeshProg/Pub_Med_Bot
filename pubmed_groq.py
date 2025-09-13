@@ -38,6 +38,10 @@ def get_user_from_request(request: Request):
         if not user_id:
             raise HTTPException(status_code=401, detail="Token missing user id")
         return {"user_id": str(user_id), "email": email}
+    except pyjwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except pyjwt.InvalidTokenError as e:
+        raise HTTPException(status_code=401, detail="Invalid token")
     except Exception as e:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
 
@@ -58,7 +62,7 @@ app = FastAPI(title="Semantic PubMed API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -67,7 +71,7 @@ app.add_middleware(
 # -----------------------------
 # MongoDB (stores all results)
 # -----------------------------
-connection_string = "mongodb+srv://praneeshroshan_db_user:0F6f0m54x4MJ9Qbz@cts.aevkhjk.mongodb.net/?retryWrites=true&w=majority&appName=CTS"
+connection_string = os.getenv("MONGO_URI", "mongodb+srv://praneeshroshan_db_user:0F6f0m54x4MJ9Qbz@cts.aevkhjk.mongodb.net/?retryWrites=true&w=majority&appName=CTS")
 mongo_client = MongoClient(connection_string)
 db = mongo_client["groq_db"]
 semantic_collection = db["articles"]
