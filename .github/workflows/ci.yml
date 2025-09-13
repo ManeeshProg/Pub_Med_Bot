@@ -119,42 +119,71 @@ jobs:
       - name: Deploy Node.js Backend
         uses: azure/container-apps-deploy-action@v1
         with:
-          container-app-name: node-backend-app
-          resource-group: ${{ env.RESOURCE_GROUP }}
-          image: ${{ env.ACR_NAME }}.azurecr.io/node-backend:latest
-          environment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
+          containerAppName: node-backend-app
+          resourceGroup: ${{ env.RESOURCE_GROUP }}
+          imageToDeploy: ${{ env.ACR_NAME }}.azurecr.io/node-backend:latest
+          containerAppEnvironment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
+          registryUrl: ${{ env.ACR_NAME }}.azurecr.io
+          registryUsername: ${{ secrets.AZURE_CLIENT_ID }}
+          registryPassword: ${{ secrets.AZURE_CLIENT_SECRET }}
+          environmentVariables: |
+            MONGO_URI=${{ secrets.MONGO_URI }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
 
       - name: Deploy Chatbot API
         uses: azure/container-apps-deploy-action@v1
         with:
-          container-app-name: chatbot-api-app
-          resource-group: ${{ env.RESOURCE_GROUP }}
-          image: ${{ env.ACR_NAME }}.azurecr.io/chatbot-api:latest
-          environment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
+          containerAppName: chatbot-api-app
+          resourceGroup: ${{ env.RESOURCE_GROUP }}
+          imageToDeploy: ${{ env.ACR_NAME }}.azurecr.io/chatbot-api:latest
+          containerAppEnvironment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
+          registryUrl: ${{ env.ACR_NAME }}.azurecr.io
+          registryUsername: ${{ secrets.AZURE_CLIENT_ID }}
+          registryPassword: ${{ secrets.AZURE_CLIENT_SECRET }}
+          environmentVariables: |
+            GROQ_API=${{ secrets.GROQ_API }}
+            MONGO_URI=${{ secrets.MONGO_URI }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
 
       - name: Deploy Advanced API
         uses: azure/container-apps-deploy-action@v1
         with:
-          container-app-name: advanced-api-app
-          resource-group: ${{ env.RESOURCE_GROUP }}
-          image: ${{ env.ACR_NAME }}.azurecr.io/advanced-api:latest
-          environment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
+          containerAppName: advanced-api-app
+          resourceGroup: ${{ env.RESOURCE_GROUP }}
+          imageToDeploy: ${{ env.ACR_NAME }}.azurecr.io/advanced-api:latest
+          containerAppEnvironment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
+          registryUrl: ${{ env.ACR_NAME }}.azurecr.io
+          registryUsername: ${{ secrets.AZURE_CLIENT_ID }}
+          registryPassword: ${{ secrets.AZURE_CLIENT_SECRET }}
+          environmentVariables: |
+            MONGO_URI=${{ secrets.MONGO_URI }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            NCBI_API_KEY=${{ secrets.NCBI_API_KEY }}
 
       - name: Deploy Groq API
         uses: azure/container-apps-deploy-action@v1
         with:
-          container-app-name: groq-api-app
-          resource-group: ${{ env.RESOURCE_GROUP }}
-          image: ${{ env.ACR_NAME }}.azurecr.io/groq-api:latest
-          environment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
+          containerAppName: groq-api-app
+          resourceGroup: ${{ env.RESOURCE_GROUP }}
+          imageToDeploy: ${{ env.ACR_NAME }}.azurecr.io/groq-api:latest
+          containerAppEnvironment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
+          registryUrl: ${{ env.ACR_NAME }}.azurecr.io
+          registryUsername: ${{ secrets.AZURE_CLIENT_ID }}
+          registryPassword: ${{ secrets.AZURE_CLIENT_SECRET }}
+          environmentVariables: |
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
 
       - name: Deploy Frontend
         uses: azure/container-apps-deploy-action@v1
         with:
-          container-app-name: frontend-app
-          resource-group: ${{ env.RESOURCE_GROUP }}
-          image: ${{ env.ACR_NAME }}.azurecr.io/frontend:latest
-          environment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
+          containerAppName: frontend-app
+          resourceGroup: ${{ env.RESOURCE_GROUP }}
+          imageToDeploy: ${{ env.ACR_NAME }}.azurecr.io/frontend:latest
+          containerAppEnvironment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
+          registryUrl: ${{ env.ACR_NAME }}.azurecr.io
+          registryUsername: ${{ secrets.AZURE_CLIENT_ID }}
+          registryPassword: ${{ secrets.AZURE_CLIENT_SECRET }}
 
       - name: Azure Logout
         run: az logout
