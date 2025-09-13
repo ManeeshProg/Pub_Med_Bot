@@ -5,6 +5,9 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 app.use(cors());
@@ -13,8 +16,7 @@ app.use(bodyParser.json());
 // -----------------------------
 // MongoDB Connection
 // -----------------------------
-const mongoURI =
-  "mongodb+srv://praneeshroshan_db_user:0F6f0m54x4MJ9Qbz@cts.aevkhjk.mongodb.net/?retryWrites=true&w=majority&appName=CTS";
+const mongoURI = process.env.MONGO_URI;
 
 mongoose
   .connect(mongoURI, {
@@ -40,7 +42,7 @@ const User = mongoose.model("User", userSchema);
 // -----------------------------
 // JWT Secret
 // -----------------------------
-const JWT_SECRET = "supersecretkey";
+const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
 // -----------------------------
 // Health check route
