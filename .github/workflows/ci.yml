@@ -16,6 +16,12 @@ jobs:
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
       GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+      # Azure Credentials for ACR
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ACR_NAME: ${{ secrets.ACR_NAME }}
 
     steps:
       - name: Checkout code
@@ -42,3 +48,38 @@ jobs:
 
       - name: Build frontend
         run: npm run build
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Build and push Node.js backend image
+        run: |
+          docker build -t ${{ env.ACR_NAME }}.azurecr.io/node-backend:latest -f Dockerfile.node .
+          docker push ${{ env.ACR_NAME }}.azurecr.io/node-backend:latest
+
+      - name: Build and push Chatbot API image
+        run: |
+          docker build -t ${{ env.ACR_NAME }}.azurecr.io/chatbot-api:latest -f Dockerfile.chatbot .
+          docker push ${{ env.ACR_NAME }}.azurecr.io/chatbot-api:latest
+
+      - name: Build and push Advanced API image
+        run: |
+          docker build -t ${{ env.ACR_NAME }}.azurecr.io/advanced-api:latest -f Dockerfile.advanced_api .
+          docker push ${{ env.ACR_NAME }}.azurecr.io/advanced-api:latest
+
+      - name: Build and push Groq API image
+        run: |
+          docker build -t ${{ env.ACR_NAME }}.azurecr.io/groq-api:latest -f Dockerfile.groq .
+          docker push ${{ env.ACR_NAME }}.azurecr.io/groq-api:latest
+
+      - name: Build and push Frontend image
+        run: |
+          docker build -t ${{ env.ACR_NAME }}.azurecr.io/frontend:latest -f Dockerfile.frontend .
+          docker push ${{ env.ACR_NAME }}.azurecr.io/frontend:latest
+
+      - name: Azure Logout
+        run: az logout
