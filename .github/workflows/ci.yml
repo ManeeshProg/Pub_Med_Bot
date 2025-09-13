@@ -117,7 +117,7 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy Node.js Backend
-        uses: azure/container-apps-deploy@v1
+        uses: azure/container-apps-deploy-action@v1
         with:
           container-app-name: node-backend-app
           resource-group: ${{ env.RESOURCE_GROUP }}
@@ -125,7 +125,7 @@ jobs:
           environment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
 
       - name: Deploy Chatbot API
-        uses: azure/container-apps-deploy@v1
+        uses: azure/container-apps-deploy-action@v1
         with:
           container-app-name: chatbot-api-app
           resource-group: ${{ env.RESOURCE_GROUP }}
@@ -133,7 +133,7 @@ jobs:
           environment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
 
       - name: Deploy Advanced API
-        uses: azure/container-apps-deploy@v1
+        uses: azure/container-apps-deploy-action@v1
         with:
           container-app-name: advanced-api-app
           resource-group: ${{ env.RESOURCE_GROUP }}
@@ -141,7 +141,7 @@ jobs:
           environment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
 
       - name: Deploy Groq API
-        uses: azure/container-apps-deploy@v1
+        uses: azure/container-apps-deploy-action@v1
         with:
           container-app-name: groq-api-app
           resource-group: ${{ env.RESOURCE_GROUP }}
@@ -149,7 +149,7 @@ jobs:
           environment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
 
       - name: Deploy Frontend
-        uses: azure/container-apps-deploy@v1
+        uses: azure/container-apps-deploy-action@v1
         with:
           container-app-name: frontend-app
           resource-group: ${{ env.RESOURCE_GROUP }}
