@@ -17,6 +17,6 @@ export const PUBLICATION_TYPES = [
   "Clinical Trial",
 ];
 
-export const ADVANCED_API_BASE = 'http://localhost:8000';
-export const CHATBOT_API_BASE = 'http://localhost:8002';
-export const SEMANTIC_SEARCH_API_BASE = 'http://localhost:8002';
+export const ADVANCED_API_BASE = 'https://advanced-api-app.wonderfulriver-100a84c4.eastasia.azurecontainerapps.io';
+export const CHATBOT_API_BASE = 'https://chatbot-api-app.wonderfulriver-100a84c4.eastasia.azurecontainerapps.io';
+export const SEMANTIC_SEARCH_API_BASE = 'https://chatbot-api-app.wonderfulriver-100a84c4.eastasia.azurecontainerapps.io';
