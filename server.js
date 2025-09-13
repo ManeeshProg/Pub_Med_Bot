@@ -168,6 +168,15 @@ app.post('/api/chatbot/:mode', async (req, res) => {
 });
 
 // -----------------------------
+// Serve Frontend
+// -----------------------------
+app.use(express.static("dist"));
+
+app.get("*", (req, res) => {
+  res.sendFile("dist/index.html", { root: "." });
+});
+
+// -----------------------------
 // Start Server
 // -----------------------------
 app.listen(5000, () => console.log("🚀 Server running on port 5000"));

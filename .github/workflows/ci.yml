@@ -124,11 +124,15 @@ jobs:
           imageToDeploy: ${{ env.ACR_NAME }}.azurecr.io/node-backend:latest
           containerAppEnvironment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
           registryUrl: ${{ env.ACR_NAME }}.azurecr.io
-          registryUsername: ${{ secrets.AZURE_CLIENT_ID }}
-          registryPassword: ${{ secrets.AZURE_CLIENT_SECRET }}
+          registryUsername: ${{ env.ACR_NAME }}
+          registryPassword: ${{ secrets.ACR_PASSWORD }}
+          targetPort: 5000
+          ingress: external
           environmentVariables: |
             MONGO_URI=${{ secrets.MONGO_URI }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
+            NODE_ENV=production
+            PORT=5000
 
       - name: Deploy Chatbot API
         uses: azure/container-apps-deploy-action@v1
@@ -138,8 +142,10 @@ jobs:
           imageToDeploy: ${{ env.ACR_NAME }}.azurecr.io/chatbot-api:latest
           containerAppEnvironment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
           registryUrl: ${{ env.ACR_NAME }}.azurecr.io
-          registryUsername: ${{ secrets.AZURE_CLIENT_ID }}
-          registryPassword: ${{ secrets.AZURE_CLIENT_SECRET }}
+          registryUsername: ${{ env.ACR_NAME }}
+          registryPassword: ${{ secrets.ACR_PASSWORD }}
+          targetPort: 8002
+          ingress: external
           environmentVariables: |
             GROQ_API=${{ secrets.GROQ_API }}
             MONGO_URI=${{ secrets.MONGO_URI }}
@@ -153,8 +159,10 @@ jobs:
           imageToDeploy: ${{ env.ACR_NAME }}.azurecr.io/advanced-api:latest
           containerAppEnvironment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
           registryUrl: ${{ env.ACR_NAME }}.azurecr.io
-          registryUsername: ${{ secrets.AZURE_CLIENT_ID }}
-          registryPassword: ${{ secrets.AZURE_CLIENT_SECRET }}
+          registryUsername: ${{ env.ACR_NAME }}
+          registryPassword: ${{ secrets.ACR_PASSWORD }}
+          targetPort: 8000
+          ingress: external
           environmentVariables: |
             MONGO_URI=${{ secrets.MONGO_URI }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
@@ -168,11 +176,14 @@ jobs:
           imageToDeploy: ${{ env.ACR_NAME }}.azurecr.io/groq-api:latest
           containerAppEnvironment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
           registryUrl: ${{ env.ACR_NAME }}.azurecr.io
-          registryUsername: ${{ secrets.AZURE_CLIENT_ID }}
-          registryPassword: ${{ secrets.AZURE_CLIENT_SECRET }}
+          registryUsername: ${{ env.ACR_NAME }}
+          registryPassword: ${{ secrets.ACR_PASSWORD }}
+          targetPort: 8001
+          ingress: external
           environmentVariables: |
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
+            GROQ_API=${{ secrets.GROQ_API }}
 
       - name: Deploy Frontend
         uses: azure/container-apps-deploy-action@v1
@@ -182,8 +193,10 @@ jobs:
           imageToDeploy: ${{ env.ACR_NAME }}.azurecr.io/frontend:latest
           containerAppEnvironment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
           registryUrl: ${{ env.ACR_NAME }}.azurecr.io
-          registryUsername: ${{ secrets.AZURE_CLIENT_ID }}
-          registryPassword: ${{ secrets.AZURE_CLIENT_SECRET }}
+          registryUsername: ${{ env.ACR_NAME }}
+          registryPassword: ${{ secrets.ACR_PASSWORD }}
+          targetPort: 80
+          ingress: external
 
       - name: Azure Logout
         run: az logout

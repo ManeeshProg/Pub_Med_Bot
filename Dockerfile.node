@@ -8,10 +8,15 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm ci --only=production
 
-# Copy the rest of the application code
-COPY . .
+# Copy only necessary application files
+COPY server.js ./
+COPY *.js ./
+
+# Create a non-root user for security
+RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
+USER nodejs
 
 # Expose the port the app runs on
 EXPOSE 5000
