@@ -64,6 +64,10 @@ class AdvancedQuery(BaseModel):
     retmax: Optional[int] = 10
     filters: Optional[SearchFilters] = None
 
+class SemanticQuery(BaseModel):
+    query: str
+    retmax: Optional[int] = 10
+
 # -----------------------------
 # JWT Decode Dependency
 # -----------------------------
@@ -77,6 +81,12 @@ def get_current_user(authorization: str = Header(...)):
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         print("JWT payload:", payload)
         return payload["id"]  # adjust key if needed
+    except jwt.ExpiredSignatureError:
+        print("JWT error: Token has expired")
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.InvalidTokenError as e:
+        print("JWT error: Invalid token -", e)
+        raise HTTPException(status_code=401, detail="Invalid token")
     except Exception as e:
         print("JWT error:", e)
         raise HTTPException(status_code=401, detail="Invalid or expired token")
@@ -245,6 +255,33 @@ def search_pubmed(query: AdvancedQuery, user_id: str = Depends(get_current_user)
     history_collection.insert_one(history_doc)
 
     return {"source": source, "results": results}
+
+# -----------------------------
+# API Endpoint: Semantic Search
+# -----------------------------
+@app.post("/search/semantic")
+def search_semantic(query: SemanticQuery, user_id: str = Depends(get_current_user)):
+    if not query.query.strip():
+        raise HTTPException(status_code=400, detail="Query cannot be empty.")
+
+    # TODO: Implement actual semantic search logic here.
+    # For now, using the existing keyword-based search as a placeholder.
+    search_term = query.query
+    pmids = pubmed_esearch(search_term, retmax=query.retmax)
+    results = pubmed_efetch_text(pmids, keyword=query.query)
+
+    # Save user search history
+    history_doc = {
+        "user_id": user_id,
+        "query": query.query,
+        "filters": {},
+        "timestamp": datetime.now(timezone.utc),
+        "results_count": len(results),
+        "search_type": "semantic" # Add a field to distinguish search type
+    }
+    history_collection.insert_one(history_doc)
+
+    return {"source": "api", "results": results}
 
 # -----------------------------
 # API Endpoint: Get User History

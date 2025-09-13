@@ -1,6 +1,7 @@
 import type { PubMedArticle, FilterState } from '../types';
 import axios from 'axios';
 import { ADVANCED_API_BASE } from '../constants';
+import { makeAuthenticatedRequest } from '../utils/auth.js';
 
 /**
  * Sends a search request to the PubMed API backend.
@@ -12,27 +13,28 @@ import { ADVANCED_API_BASE } from '../constants';
 export async function searchPubMed(query: string, filters?: FilterState, retmax: number = 10): Promise<PubMedArticle[]> {
   console.log('Searching PubMed for query:', query);
 
-  try {
-    const token = localStorage.getItem('jwt_token'); // JWT from login
-    if (!token) {
-      throw new Error('You must be logged in to search.');
-    }
+  const token = localStorage.getItem('jwt_token');
+  if (!token) {
+    throw new Error('You must be logged in to search.');
+  }
 
-    const backendFilters: any = {
-      pub_year_range: "All",
-      article_types: filters?.publicationTypes || [],
-      custom_range: filters?.fromDate && filters?.toDate ? 
-        [parseInt(filters.fromDate), parseInt(filters.toDate)] : null
-    };
-    
-    if (filters?.fromDate && filters?.toDate) {
-      backendFilters.pub_year_range = "Custom Range";
-    }
+  const backendFilters: any = {
+    pub_year_range: "All",
+    article_types: filters?.publicationTypes || [],
+    custom_range: filters?.fromDate && filters?.toDate ?
+      [parseInt(filters.fromDate), parseInt(filters.toDate)] : null
+  };
 
+  if (filters?.fromDate && filters?.toDate) {
+    backendFilters.pub_year_range = "Custom Range";
+  }
+
+  return await makeAuthenticatedRequest(async () => {
+    const currentToken = localStorage.getItem('jwt_token');
     const response = await axios.post(
       `${ADVANCED_API_BASE}/search/advanced`,
       { query, retmax, filters: backendFilters },
-      { headers: { Authorization: `Bearer ${token}` } }
+      { headers: { Authorization: `Bearer ${currentToken}` } }
     );
 
     return response.data.results.map((article: any) => ({
@@ -43,17 +45,21 @@ export async function searchPubMed(query: string, filters?: FilterState, retmax:
       source: article.Journal,
       abstract: article.Abstract
     }));
-  } catch (error) {
-    console.error('Error searching PubMed:', error);
-    throw error;
-  }
+  });
 }
 
 export async function listCachedAdvanced(): Promise<any[]> {
   const token = localStorage.getItem('jwt_token');
-  const res = await axios.get(`${ADVANCED_API_BASE}/cache/advanced`, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {}
+  if (!token) {
+    throw new Error('You must be logged in to access cached results.');
+  }
+
+  return await makeAuthenticatedRequest(async () => {
+    const currentToken = localStorage.getItem('jwt_token');
+    const res = await axios.get(`${ADVANCED_API_BASE}/cache/advanced`, {
+      headers: { Authorization: `Bearer ${currentToken}` }
+    });
+    return res.data?.items ?? [];
   });
-  return res.data?.items ?? [];
 }
 

@@ -6,6 +6,11 @@ import bodyParser from "body-parser";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -86,8 +91,8 @@ app.post("/login", async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ error: "Invalid email or password" });
 
-    // Generate JWT
-    const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: "2h" });
+    // Generate JWT with longer expiration
+    const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: "24h" });
 
     // Store JWT in the user document
     user.jwt_token = token;
@@ -116,6 +121,42 @@ app.get("/get-token/:email", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
+  }
+});
+
+// -----------------------------
+// Token Refresh Endpoint
+// -----------------------------
+app.post("/refresh-token", async (req, res) => {
+  const authHeader = req.headers["authorization"];
+  if (!authHeader) return res.status(401).json({ error: "Missing token" });
+
+  const oldToken = authHeader.split(" ")[1];
+  try {
+    // Even if token is expired, we can still decode it to get user info (ignoreExpiration: true)
+    const decoded = jwt.verify(oldToken, JWT_SECRET, { ignoreExpiration: true });
+
+    // Find user and verify the token matches what's stored
+    const user = await User.findById(decoded.id);
+    if (!user || user.jwt_token !== oldToken) {
+      return res.status(401).json({ error: "Invalid token" });
+    }
+
+    // Generate new token with longer expiration
+    const newToken = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: "24h" });
+
+    // Update stored token
+    user.jwt_token = newToken;
+    await user.save();
+
+    res.json({
+      message: "Token refreshed successfully",
+      token: newToken,
+      user: { id: user._id, name: user.name, email: user.email },
+    });
+  } catch (err) {
+    console.error("Token refresh error:", err);
+    return res.status(401).json({ error: "Invalid token" });
   }
 });
 
@@ -172,8 +213,8 @@ app.post('/api/chatbot/:mode', async (req, res) => {
 // -----------------------------
 app.use(express.static("dist"));
 
-app.get("*", (req, res) => {
-  res.sendFile("dist/index.html", { root: "." });
+app.use((req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
 // -----------------------------
