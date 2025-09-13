@@ -10,8 +10,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write # This is the missing permission
-      contents: read # Good practice to explicitly set this
+      id-token: write
+      contents: read
 
     env:
       GROQ_API: ${{ secrets.GROQ_API }}
@@ -19,7 +19,6 @@ jobs:
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
       GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-      # Azure Credentials for ACR
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
@@ -86,6 +85,76 @@ jobs:
         run: |
           docker build -t ${{ env.ACR_NAME }}.azurecr.io/frontend:latest -f Dockerfile.frontend .
           docker push ${{ env.ACR_NAME }}.azurecr.io/frontend:latest
+
+      - name: Azure Logout
+        run: az logout
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      id-token: write
+      contents: read
+
+    env:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ACR_NAME: ${{ secrets.ACR_NAME }}
+      RESOURCE_GROUP: maneesh_grp
+      CONTAINER_APP_ENVIRONMENT: pubmed-env
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy Node.js Backend
+        uses: azure/container-apps-deploy@v1
+        with:
+          container-app-name: node-backend-app
+          resource-group: ${{ env.RESOURCE_GROUP }}
+          image: ${{ env.ACR_NAME }}.azurecr.io/node-backend:latest
+          environment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
+
+      - name: Deploy Chatbot API
+        uses: azure/container-apps-deploy@v1
+        with:
+          container-app-name: chatbot-api-app
+          resource-group: ${{ env.RESOURCE_GROUP }}
+          image: ${{ env.ACR_NAME }}.azurecr.io/chatbot-api:latest
+          environment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
+
+      - name: Deploy Advanced API
+        uses: azure/container-apps-deploy@v1
+        with:
+          container-app-name: advanced-api-app
+          resource-group: ${{ env.RESOURCE_GROUP }}
+          image: ${{ env.ACR_NAME }}.azurecr.io/advanced-api:latest
+          environment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
+
+      - name: Deploy Groq API
+        uses: azure/container-apps-deploy@v1
+        with:
+          container-app-name: groq-api-app
+          resource-group: ${{ env.RESOURCE_GROUP }}
+          image: ${{ env.ACR_NAME }}.azurecr.io/groq-api:latest
+          environment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
+
+      - name: Deploy Frontend
+        uses: azure/container-apps-deploy@v1
+        with:
+          container-app-name: frontend-app
+          resource-group: ${{ env.RESOURCE_GROUP }}
+          image: ${{ env.ACR_NAME }}.azurecr.io/frontend:latest
+          environment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
 
       - name: Azure Logout
         run: az logout
