@@ -32,10 +32,13 @@ jobs:
           python-version: '3.10'
 
       - name: Install Node.js dependencies
-        run: npm install
+        run: npm ci
 
       - name: Install Python dependencies
         run: pip install -r requirements.txt
+
+      - name: Check vite permissions
+        run: ls -l node_modules/.bin/vite
 
       - name: Build frontend
         run: npm run build
