@@ -9,6 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write # This is the missing permission
+      contents: read # Good practice to explicitly set this
 
     env:
       GROQ_API: ${{ secrets.GROQ_API }}
