@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import axios from 'axios';
 import Login from './components/Login';
 import Register from './components/Register';
 import Sidebar from './components/Sidebar';
@@ -12,6 +13,7 @@ import GroqSearchPage from './components/GroqSearchPage';
 import GroqHistory from './components/GroqHistory';
 import Dashboard from './components/Dashboard';
 import ChatbotPage from './components/ChatbotPage';
+import { refreshToken } from './utils/auth.js';
 
 const ProtectedLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const isLoggedIn = !!localStorage.getItem('loggedInUser');
@@ -28,6 +30,58 @@ const ProtectedLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
 };
 
 const App: React.FC = () => {
+  useEffect(() => {
+    // Set up axios interceptors for automatic token refresh
+    const requestInterceptor = axios.interceptors.request.use(
+      (config) => {
+        const token = localStorage.getItem('jwt_token');
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+      },
+      (error) => {
+        return Promise.reject(error);
+      }
+    );
+
+    const responseInterceptor = axios.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
+
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
+
+          try {
+            console.log('Token expired, attempting to refresh...');
+            await refreshToken();
+            const newToken = localStorage.getItem('jwt_token');
+
+            if (newToken) {
+              originalRequest.headers.Authorization = `Bearer ${newToken}`;
+              return axios(originalRequest);
+            }
+          } catch (refreshError) {
+            console.error('Token refresh failed:', refreshError);
+            localStorage.removeItem('jwt_token');
+            localStorage.removeItem('loggedInUser');
+            window.location.href = '/login';
+            return Promise.reject(refreshError);
+          }
+        }
+
+        return Promise.reject(error);
+      }
+    );
+
+    // Cleanup interceptors on unmount
+    return () => {
+      axios.interceptors.request.eject(requestInterceptor);
+      axios.interceptors.response.eject(responseInterceptor);
+    };
+  }, []);
+
   return (
     <Router>
       <Routes>
