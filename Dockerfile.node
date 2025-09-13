@@ -10,9 +10,10 @@ COPY package*.json ./
 # Install dependencies
 RUN npm ci --only=production
 
-# Copy only necessary application files
-COPY server.js ./
-COPY *.js ./
+# Copy all application files (needed for ES modules)
+COPY . .
+# Remove node_modules that might have been copied
+RUN rm -rf node_modules
 
 # Create a non-root user for security
 RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
