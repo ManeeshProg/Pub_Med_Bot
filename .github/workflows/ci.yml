@@ -140,6 +140,7 @@ jobs:
             MONGO_URI=${{ secrets.MONGO_URI }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
+            GROQ_API=${{ secrets.GROQ_API }}
 
       - name: Deploy Advanced API
         uses: azure/container-apps-deploy-action@v1
