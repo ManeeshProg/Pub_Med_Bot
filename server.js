@@ -15,7 +15,22 @@ const __dirname = path.dirname(__filename);
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+const allowedOrigins = [
+  'https://frontend-app.wonderfulriver-100a84c4.eastasia.azurecontainerapps.io',
+  'http://localhost:3000', // for local development
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
+
 app.use(bodyParser.json());
 
 // -----------------------------
@@ -192,7 +207,7 @@ app.post('/api/chatbot/:mode', async (req, res) => {
     }
     
     // Forward request to the Python FastAPI backend
-    const response = await fetch(`http://localhost:8001/${mode}`, {
+    const response = await fetch(`http://chatbot-api-app:8002/${mode}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -206,15 +221,6 @@ app.post('/api/chatbot/:mode', async (req, res) => {
     console.error('Chatbot API error:', err);
     res.status(500).json({ error: 'Error connecting to chatbot service' });
   }
-});
-
-// -----------------------------
-// Serve Frontend
-// -----------------------------
-app.use(express.static("dist"));
-
-app.use((req, res) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
 // -----------------------------
