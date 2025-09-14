@@ -117,9 +117,7 @@ jobs:
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           imageToDeploy: ${{ env.ACR_NAME }}.azurecr.io/node-backend:latest
           containerAppEnvironment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
-          registryUrl: ${{ env.ACR_NAME }}.azurecr.io
-          registryUsername: ${{ env.ACR_NAME }}
-          registryPassword: ${{ secrets.ACR_PASSWORD }}
+          acrName: ${{ env.ACR_NAME }}
           targetPort: 5000
           ingress: external
           environmentVariables: |
@@ -135,9 +133,7 @@ jobs:
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           imageToDeploy: ${{ env.ACR_NAME }}.azurecr.io/chatbot-api:latest
           containerAppEnvironment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
-          registryUrl: ${{ env.ACR_NAME }}.azurecr.io
-          registryUsername: ${{ env.ACR_NAME }}
-          registryPassword: ${{ secrets.ACR_PASSWORD }}
+          acrName: ${{ env.ACR_NAME }}
           targetPort: 8002
           ingress: external
           environmentVariables: |
@@ -152,9 +148,7 @@ jobs:
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           imageToDeploy: ${{ env.ACR_NAME }}.azurecr.io/advanced-api:latest
           containerAppEnvironment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
-          registryUrl: ${{ env.ACR_NAME }}.azurecr.io
-          registryUsername: ${{ env.ACR_NAME }}
-          registryPassword: ${{ secrets.ACR_PASSWORD }}
+          acrName: ${{ env.ACR_NAME }}
           targetPort: 8000
           ingress: external
           environmentVariables: |
@@ -169,9 +163,7 @@ jobs:
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           imageToDeploy: ${{ env.ACR_NAME }}.azurecr.io/frontend:latest
           containerAppEnvironment: ${{ env.CONTAINER_APP_ENVIRONMENT }}
-          registryUrl: ${{ env.ACR_NAME }}.azurecr.io
-          registryUsername: ${{ env.ACR_NAME }}
-          registryPassword: ${{ secrets.ACR_PASSWORD }}
+          acrName: ${{ env.ACR_NAME }}
           targetPort: 80
           ingress: external
 
