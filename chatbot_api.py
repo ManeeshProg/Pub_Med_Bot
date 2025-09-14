@@ -372,6 +372,10 @@ def semantic_rerank(user_query, articles, top_k=5, threshold=0.85, title_weight=
 # -----------------------------
 # 11. API Endpoint: Semantic Search
 # -----------------------------
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
 @app.post("/search/semantic")
 def search_semantic(body: SemanticQuery, user: dict = Depends(get_current_user)):
     try:
