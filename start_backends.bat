@@ -1,0 +1,13 @@
+@echo off
+echo Starting Backend Services...
+
+echo Starting PubMed Advanced API (Port 8000)...
+start cmd /k "python -m uvicorn pubmed_advanced_api_only:app --reload --port 8000"
+
+echo Starting Chatbot API (Port 8001)...
+start cmd /k "set PORT=8001 && python -m uvicorn chatbot_api:app --reload --port 8001"
+
+echo Starting Node.js Server (Port 5000)...
+start cmd /k "node server.js"
+
+echo All backend services launched.
